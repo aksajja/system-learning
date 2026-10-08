@@ -6,13 +6,13 @@ System design interview prep, done by building. Each experiment starts the way a
 
 ## Two ways in
 
-- **Reading and learning:** use the site, **System Design Lab** (link: *add after the first Cloudflare deploy*). It has lessons, cheat sheets and lab pages, each with an **Open this lab** button that starts a GitHub Codespace with Go, Claude Code and the ports ready.
+- **Reading and learning:** use the site, **System Design Lab** (link: *add after the first Cloudflare deploy*). It's free and open to everyone, with no sign-up. It has lessons, cheat sheets and lab pages, each with an **Open this lab** button that starts a GitHub Codespace with Go, Claude Code and the ports ready.
 - **Building:** each experiment folder's README holds the working notes: what's built, what's next, how to run it, and what we learned along the way.
 
 | Order | Experiment | Status | Lessons |
 |---|---|---|---|
-| 1 | [load-balancer/](load-balancer/README.md) | Built: backends, reverse proxy, round-robin | [cheat sheet](lessons/load-balancer/cheat-sheet.md), [deep dives](lessons/load-balancer/deep-dives.md), [lab](lessons/load-balancer/lab.mdx) |
-| 2 | [rate-limiter/](rate-limiter/README.md) | Planned (next) | none yet |
+| 1 | [load-balancer/](load-balancer/README.md) | Built: backends, reverse proxy, round-robin | [lessons/load-balancer/](lessons/load-balancer/): cheat sheet, algorithms, client IP, deep dives, lab, FAQ |
+| 2 | [rate-limiter/](rate-limiter/README.md) | Planned (next) | [lessons/rate-limiter/](lessons/rate-limiter/): where rate limiting lives, FAQ |
 | 3 | [chat-system/](chat-system/README.md) | Designed, not built | [lessons/chat-system/](lessons/chat-system/) |
 | – | [traffic-generator/](traffic-generator/README.md) | Planned | shared tool to drive load |
 | – | [misc/](misc/README.md) | Notes only | [lessons/misc/](lessons/misc/): DNS, E2EE, load generation limits |
@@ -49,6 +49,12 @@ cd site && npm install && npm run dev   # http://localhost:4321
 
 Ports: load balancer **8090**, backends **8081–8083**, site dev server **4321**. 8080 is avoided because it's often already in use.
 
+## Using this for your own prep
+
+Everything here is public. Read the site, open any lab in a Codespace, or click **Use this template** (or fork) to get your own copy and run the same process with Claude Code for new topics.
+
+Codespaces you open are billed to **your own** GitHub account, which includes free monthly hours (120 core-hours on a free account, about 60 hours on the default 2-core machine). By default nothing is charged beyond that: the codespace simply stops.
+
 ## Repo layout
 
 ```
@@ -63,3 +69,8 @@ chat-system/         working notes (plan)
 traffic-generator/   working notes (plan)
 misc/                index of side topics
 ```
+
+## Licence
+
+- **Code** (Go, Rust, the site, config): [MIT](LICENSE).
+- **Written content** (`lessons/` and the notes): [CC BY 4.0](LICENSE-CONTENT.md). Reuse it freely with credit.
