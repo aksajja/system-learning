@@ -1,0 +1,28 @@
+---
+// "Open this lab" button: launches a GitHub Codespace with Go, Claude Code and
+// the lab's ports ready (see .devcontainer/devcontainer.json in the repo root).
+import { Aside, LinkButton } from '@astrojs/starlight/components';
+import { CODESPACES_URL } from '../consts';
+
+interface Props {
+	/** Folder to work in once the codespace opens, e.g. "load-balancer/go". */
+	folder: string;
+	/** VS Code task that starts everything for this lab, if there is one. */
+	task?: string;
+}
+const { folder, task } = Astro.props;
+---
+
+<Aside type="note" title="Run this lab in your browser">
+	<p>
+		Opens a GitHub Codespace: VS Code in the browser with Go, Claude Code and this lab's ports
+		ready. Work in <code>{folder}</code>.
+		{task && (
+			<>
+				{' '}To start everything at once: <kbd>Ctrl/Cmd+Shift+P</kbd> → <em>Run Task</em> →
+				<em>{task}</em>.
+			</>
+		)}
+	</p>
+	<LinkButton href={CODESPACES_URL} icon="external" target="_blank">Open this lab</LinkButton>
+</Aside>

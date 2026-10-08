@@ -1,0 +1,27 @@
+// Codespaces / Dev Containers environment for the labs.
+// Opened by the "Open this lab" button on the site (https://codespaces.new/<repo>).
+{
+	"name": "System Design Lab",
+	"image": "mcr.microsoft.com/devcontainers/go:1.25",
+	"features": {
+		// Claude Code in the terminal: CLAUDE.md sets it up to teach step by step.
+		"ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
+	},
+	"forwardPorts": [8090, 8081, 8082, 8083],
+	"portsAttributes": {
+		"8090": { "label": "load balancer" },
+		"8081": { "label": "backend a" },
+		"8082": { "label": "backend b" },
+		"8083": { "label": "backend c" }
+	},
+	// Download Go dependencies up front so the first `go run` is quick.
+	"postCreateCommand": "cd load-balancer/go && go mod download",
+	"customizations": {
+		"vscode": {
+			"extensions": ["golang.go"]
+		},
+		"codespaces": {
+			"openFiles": ["README.md"]
+		}
+	}
+}

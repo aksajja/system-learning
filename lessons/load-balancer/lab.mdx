@@ -1,0 +1,130 @@
+---
+title: "Lab: build a load balancer"
+description: Run dummy backends, a reverse proxy and round-robin in Go, and watch connection reuse, X-Forwarded-For and data races happen.
+sidebar:
+  order: 5
+---
+
+import { OpenLab, Steps } from '../../site/src/components/mdx';
+
+Three small steps, each ending with something you run and watch. The code is already written ([`backend/main.go`](https://github.com/aksajja/system-learning/blob/main/load-balancer/go/backend/main.go) and [`proxy/main.go`](https://github.com/aksajja/system-learning/blob/main/load-balancer/go/proxy/main.go), about 120 lines in total, standard library only). Read it alongside each step: the comments explain the Go idioms.
+
+<OpenLab folder="load-balancer/go" task="Load balancer lab: start all" />
+
+**Running locally instead?** You need [Go](https://go.dev/dl/) 1.25 or later. Clone the repo, `cd load-balancer/go`, and open a few terminals. Ports: backends on 8081–8083, the load balancer on 8090.
+
+## Step 1: Dummy backends
+
+**Why:** a load balancer needs something to balance. One program started several times, each copy replying with its own name, lets you see who answered.
+
+<Steps>
+
+1. Start a backend, then send it a request from a second terminal:
+
+   ```sh
+   go run ./backend -port 8081 -name a
+   curl localhost:8081            # hello from a
+   ```
+
+2. Look at the backend's log line: `GET / from [::1]:567xx`. That port is the **client's** port, an *ephemeral port* the OS assigns per connection (49152–65535 on macOS; Linux uses a different range). Run curl again: the port changes with every new connection.
+
+3. Send two requests in one curl command:
+
+   ```sh
+   curl localhost:8081 localhost:8081
+   ```
+
+   Both log lines show the **same** client port: curl reused one connection. That's **keep-alive**.
+
+</Steps>
+
+**What to notice**
+- A TCP connection is identified by (client IP, client port, server IP, server port).
+- `net/http` runs each request in its own goroutine, so one slow request doesn't block the others.
+- Keep-alive matters for proxies: reusing connections keeps them fast and stops them running out of ephemeral ports. See [port limits](/load-balancer/deep-dives/#port-limits).
+
+**Try breaking it:** `Ctrl+C` the backend, then curl it again. You get `Connection refused` instantly, because the OS kernel answers when no process is listening on the port. Restart it afterwards.
+
+## Step 2: Reverse proxy
+
+**Why:** clients should talk to one address while the work happens elsewhere. A reverse proxy is a **server to the client and a client to the backend**: it reads one request and builds a separate, new one for the backend.
+
+<Steps>
+
+1. With backend `a` running, start the proxy pointed at that backend only:
+
+   ```sh
+   go run ./proxy -backends http://localhost:8081
+   ```
+
+2. Send a few requests through it:
+
+   ```sh
+   curl localhost:8090
+   curl localhost:8090
+   curl localhost:8090
+   ```
+
+3. Compare the logs. The proxy sees a **new** client port for every curl. The backend sees the proxy arrive on **one reused connection** (the same port each time). A long-running proxy keeps its connection pool; a short-lived curl can't.
+
+4. Look at `forwarded-for` in the backend log. The backend only sees the proxy's address, so the proxy adds `X-Forwarded-For` with your address. Now pretend to be someone else:
+
+   ```sh
+   curl -H 'X-Forwarded-For: 1.2.3.4' localhost:8090
+   ```
+
+   The backend logs `1.2.3.4, ::1`: the proxy appended your real address to the list.
+
+</Steps>
+
+**What to notice**
+- In Go, the proxy uses `http.Transport.RoundTrip`, not `http.Client` (which would follow redirects itself). The Transport is created **once**, because it holds the connection pool.
+- **Headers are client-controlled text.** Trust only entries added by proxies you control, counting from the right. Taking the first entry lets anyone fake their IP, which breaks rate limits, bans and logs.
+- Not handled here: idle timeouts on pooled connections. The backend's idle timeout must be longer than the proxy's, or a request can land on a connection the backend is closing.
+
+**Try breaking it:** stop backend `a` and curl the proxy. You get `502 Bad Gateway`: the proxy got `connection refused` from the backend and reported it upstream.
+
+## Step 3: Round-robin
+
+**Why:** one backend isn't load balancing. Request *n* goes to `backends[n % len(backends)]`, so requests take turns.
+
+<Steps>
+
+1. Start three backends (or run the **Load balancer lab: start all** task in Codespaces, which also starts the proxy):
+
+   ```sh
+   go run ./backend -port 8081 -name a
+   go run ./backend -port 8082 -name b
+   go run ./backend -port 8083 -name c
+   go run ./proxy          # defaults to the three backends above
+   ```
+
+2. Send 300 requests, 30 at a time, and count who answered:
+
+   ```sh
+   seq 300 | xargs -P 30 -I{} curl -s localhost:8090 | sort | uniq -c
+   ```
+
+   You should see exactly 100 / 100 / 100.
+
+</Steps>
+
+**What to notice**
+- The counter is shared by every handler goroutine, so it's an `atomic.Uint64`. A plain `next++` is read, add, write: two goroutines can interleave and pick the same backend. That's a **data race**, which in Go means no guaranteed behaviour.
+- One `http.Transport` keeps a separate connection pool per backend.
+- Round-robin equalises the *number* of requests, not the *work*. Uneven request times are what least connections addresses.
+- Standard practice: weighted round-robin is the default almost everywhere; least connections or power of two choices for uneven or long-lived work; hashing for stickiness. See [algorithms](/load-balancer/cheat-sheet/#algorithms).
+
+**Try breaking it: hide a data race.** In `proxy/main.go`, replace the atomic counter with a plain `var next uint64`, and change the backend pick to use `next++` (then `(next-1) % ...`). Run the proxy with the race detector and send the 300 requests again:
+
+```sh
+go run -race ./proxy
+```
+
+The split still **looks perfect** (100/100/100), but the proxy prints `WARNING: DATA RACE`. Races hide in testing; the race detector catches them. Undo the change afterwards (`git checkout proxy/main.go`).
+
+## Where to go next
+
+- The [cheat sheet](/load-balancer/cheat-sheet/): what to say about everything you just ran.
+- [Deep dives](/load-balancer/deep-dives/): what happens when a backend dies mid-traffic, and how real systems scale load balancers.
+- The load balancer comes back in the [chat system](/chat-system/design/), where it has to pass WebSockets through and route to a chosen server.

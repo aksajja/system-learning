@@ -1,0 +1,47 @@
+{
+	// Run with Ctrl/Cmd+Shift+P → "Tasks: Run Task".
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Load balancer lab: start all",
+			"dependsOn": ["backend a (8081)", "backend b (8082)", "backend c (8083)", "load balancer (8090)"],
+			"problemMatcher": []
+		},
+		{
+			"label": "backend a (8081)",
+			"type": "shell",
+			"command": "go run ./backend -port 8081 -name a",
+			"options": { "cwd": "${workspaceFolder}/load-balancer/go" },
+			"isBackground": true,
+			"problemMatcher": [],
+			"presentation": { "group": "lb-lab", "panel": "dedicated" }
+		},
+		{
+			"label": "backend b (8082)",
+			"type": "shell",
+			"command": "go run ./backend -port 8082 -name b",
+			"options": { "cwd": "${workspaceFolder}/load-balancer/go" },
+			"isBackground": true,
+			"problemMatcher": [],
+			"presentation": { "group": "lb-lab", "panel": "dedicated" }
+		},
+		{
+			"label": "backend c (8083)",
+			"type": "shell",
+			"command": "go run ./backend -port 8083 -name c",
+			"options": { "cwd": "${workspaceFolder}/load-balancer/go" },
+			"isBackground": true,
+			"problemMatcher": [],
+			"presentation": { "group": "lb-lab", "panel": "dedicated" }
+		},
+		{
+			"label": "load balancer (8090)",
+			"type": "shell",
+			"command": "go run ./proxy",
+			"options": { "cwd": "${workspaceFolder}/load-balancer/go" },
+			"isBackground": true,
+			"problemMatcher": [],
+			"presentation": { "group": "lb-lab", "panel": "dedicated" }
+		}
+	]
+}

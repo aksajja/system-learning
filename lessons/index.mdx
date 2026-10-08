@@ -1,0 +1,72 @@
+---
+title: Home
+description: System design interview prep, learned by building the parts interviewers probe.
+template: splash
+hero:
+  title: System Design Lab
+  tagline: System design interview prep, learned by building. Design each system the way an interview asks, then run the parts interviewers push on, so the trade-offs are something you've seen rather than memorised.
+  actions:
+    - text: Start with the load balancer
+      link: /load-balancer/cheat-sheet/
+      icon: right-arrow
+    - text: Open the lab
+      link: /load-balancer/lab/
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '../site/src/components/mdx';
+
+## How each topic works
+
+<CardGrid>
+	<Card title="1. Design it, interview-style" icon="pencil">
+		Requirements, rough estimates, API, a high-level diagram, the data model, then deep dives and
+		trade-offs: the order you'd say them in an interview.
+	</Card>
+	<Card title="2. Build only the deep dives" icon="laptop">
+		Small Go labs for the pieces interviewers probe. Each step ends with something you run and
+		watch: curl, logs, killing a process.
+	</Card>
+	<Card title="3. Finish with a cheat sheet" icon="approve-check">
+		The short version to say out loud, plus answers to the follow-up questions you're likely to
+		get.
+	</Card>
+	<Card title="Run labs in your browser" icon="rocket">
+		Every lab page has an **Open this lab** button: a GitHub Codespace with Go, Claude Code and
+		the ports ready. No local setup needed.
+	</Card>
+</CardGrid>
+
+## Learning path
+
+<CardGrid>
+	<LinkCard
+		title="1. Load balancer"
+		description="L4 vs L7, algorithms, health checks, 'isn't it a single point of failure?' Lab: build a round-robin reverse proxy."
+		href="/load-balancer/cheat-sheet/"
+	/>
+	<LinkCard
+		title="2. Rate limiter"
+		description="Where limits can live and what each layer can see, keying on client identity, sharing counters. Coming next: algorithms and a lab."
+		href="/rate-limiter/where-it-lives/"
+	/>
+	<LinkCard
+		title="3. Chat system"
+		description="WebSockets, routing messages across servers, L7 proxies vs direct connections, connections per server, multiplexing."
+		href="/chat-system/design/"
+	/>
+	<LinkCard
+		title="Side topics"
+		description="DNS, end-to-end encryption, the limits you hit when generating load, and choosing a language for systems work."
+		href="/misc/dns/"
+	/>
+</CardGrid>
+
+## Learning with Claude Code
+
+The repo's `CLAUDE.md` sets Claude Code up as a tutor: one concept per step, the *why* before any code, a pause after each step so you can run it, and links back to interview questions. Open a lab in Codespaces, run `claude` in the terminal, and try:
+
+- "Walk me through the rate limiter interview design, Part 1."
+- "Let's build step 1 of the rate limiter."
+- "Quiz me on the load balancer cheat sheet."
+- "Design a URL shortener as a new experiment, same structure as the others."

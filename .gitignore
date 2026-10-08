@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+
+# Rust build output
+target/
+
+# Go build output
+*.exe
+*.test
+*.out
+
+# Site build output (also in site/.gitignore)
+site/node_modules/
+site/dist/
+site/.astro/
+
+# Editors: share tasks (lab launchers), keep personal settings out
+.vscode/settings.json
+.idea/
+
+# Local Claude Code settings (personal permissions)
+.claude/settings.local.json
