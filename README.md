@@ -6,7 +6,7 @@ System design interview prep, done by building. Each experiment starts the way a
 
 ## Two ways in
 
-- **Reading and learning:** use the site, **System Design Lab** (link: *add after the first Cloudflare deploy*). It's free and open to everyone, with no sign-up. It has lessons, cheat sheets and lab pages, each with an **Open this lab** button that starts a GitHub Codespace with Go, Claude Code and the ports ready.
+- **Reading and learning:** use the site, **[System Design Lab](https://system-learning.asajja.workers.dev)**. It's free and open to everyone, with no sign-up. It has lessons, cheat sheets and lab pages, each with an **Open this lab** button that starts a GitHub Codespace with Go, Claude Code and the ports ready.
 - **Building:** each experiment folder's README holds the working notes: what's built, what's next, how to run it, and what we learned along the way.
 
 | Order | Experiment | Status | Lessons |
