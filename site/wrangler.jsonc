@@ -1,0 +1,11 @@
+// Cloudflare Workers config: deploy the built static site (dist/) as-is.
+// Without this file, `wrangler deploy` tries to auto-configure Astro as a
+// server app (Cloudflare adapter), which breaks the build.
+{
+	"name": "system-learning",
+	"compatibility_date": "2026-09-01",
+	"assets": {
+		"directory": "./dist",
+		"not_found_handling": "404-page"
+	}
+}
