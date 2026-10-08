@@ -34,6 +34,22 @@ for (const file of htmlFiles(dist)) {
 		}
 	}
 }
+// Every page must be reachable from the sidebar. The home page uses the splash
+// layout (no sidebar), so take the largest sidebar found on any page.
+const sidebarLinks = (file) => {
+	const nav = readFileSync(file, 'utf8').match(/<nav class="sidebar[\s\S]*?<\/nav>/)?.[0] ?? '';
+	return new Set([...nav.matchAll(/<a\s[^>]*href="(\/[^"#]*)"/g)].map((m) => m[1]));
+};
+const inSidebar = htmlFiles(dist).map(sidebarLinks).reduce((a, b) => (b.size > a.size ? b : a), new Set());
+for (const file of htmlFiles(dist)) {
+	const page = '/' + relative(dist, file).replace(/index\.html$/, '');
+	if (page === '/404.html' || page.startsWith('/pagefind')) continue;
+	if (!inSidebar.has(page)) {
+		console.error(`${page}: not in the sidebar`);
+		broken++;
+	}
+}
+
 if (broken) {
 	console.error(`\n${broken} broken link(s)`);
 	process.exit(1);
