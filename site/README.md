@@ -12,6 +12,7 @@ npm run build     # static site in dist/
 - `src/consts.ts`: the GitHub repo name (used for the "Open this lab" and "Edit page" links).
 - `src/components/OpenLab.astro`: the "Open this lab" button (GitHub Codespaces).
 - `src/components/mdx.ts`: components lessons can import in `.mdx` files.
+- `src/components/Footer.astro`: Starlight's footer plus [giscus](https://giscus.app) comments on lesson pages. Each page's thread is a GitHub Discussion in the "Lessons" category, matched by URL path, so renaming a page orphans its thread. Comments stay off until `GISCUS.categoryId` in `src/consts.ts` is set. Setup: enable Discussions on the repo, create a "Lessons" category (Announcement type, so only giscus and maintainers open threads), install the [giscus app](https://github.com/apps/giscus) on the repo, then copy the category ID from giscus.app.
 
 ## Deploying (Cloudflare Workers)
 

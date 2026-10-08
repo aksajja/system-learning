@@ -35,6 +35,7 @@ export default defineConfig({
 			social: [{ icon: 'github', label: 'GitHub', href: REPO_URL }],
 			editLink: { baseUrl: `${REPO_URL}/edit/main/site/` },
 			lastUpdated: false,
+			components: { Footer: './src/components/Footer.astro' },
 			sidebar: [
 				{ label: 'Start here', link: '/' },
 				{ label: 'Load balancer', items: lessonsIn('load-balancer') },

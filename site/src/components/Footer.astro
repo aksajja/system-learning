@@ -1,0 +1,67 @@
+---
+// Starlight's footer plus a giscus comment thread on every lesson page.
+// Each page gets its own GitHub Discussion, matched by URL path.
+import Default from '@astrojs/starlight/components/Footer.astro';
+import { GISCUS, REPO } from '../consts';
+
+const { entry, hasSidebar } = Astro.locals.starlightRoute;
+const showComments = GISCUS.categoryId !== '' && hasSidebar && !entry.id.endsWith('404');
+---
+
+<Default />
+
+{
+	showComments && (
+		<section class="comments" aria-label="Comments">
+			<script
+				is:inline
+				src="https://giscus.app/client.js"
+				data-repo={REPO}
+				data-repo-id={GISCUS.repoId}
+				data-category={GISCUS.category}
+				data-category-id={GISCUS.categoryId}
+				data-mapping="pathname"
+				data-strict="1"
+				data-reactions-enabled="1"
+				data-emit-metadata="0"
+				data-input-position="top"
+				data-theme={'preferred_color_scheme'}
+				data-lang="en"
+				data-loading="lazy"
+				crossorigin="anonymous"
+				async
+			/>
+		</section>
+	)
+}
+
+<script>
+	// Keep giscus in step with Starlight's light/dark toggle, which sets
+	// <html data-theme>. giscus runs in an iframe, so we tell it by postMessage.
+	const themeNow = () => (document.documentElement.dataset.theme === 'light' ? 'light' : 'dark');
+
+	function sendTheme() {
+		const frame = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
+		frame?.contentWindow?.postMessage(
+			{ giscus: { setConfig: { theme: themeNow() } } },
+			'https://giscus.app',
+		);
+	}
+
+	new MutationObserver(sendTheme).observe(document.documentElement, {
+		attributes: true,
+		attributeFilter: ['data-theme'],
+	});
+	// The iframe loads after this script runs: set the theme when it first speaks.
+	window.addEventListener('message', function onReady(event) {
+		if (event.origin !== 'https://giscus.app' || !event.data?.giscus) return;
+		sendTheme();
+		window.removeEventListener('message', onReady);
+	});
+</script>
+
+<style>
+	.comments {
+		margin-top: 3rem;
+	}
+</style>
