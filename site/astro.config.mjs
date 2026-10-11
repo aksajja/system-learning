@@ -38,9 +38,11 @@ export default defineConfig({
 			components: { Footer: './src/components/Footer.astro' },
 			sidebar: [
 				{ label: 'Start here', link: '/' },
+				{ label: 'Interview skills', items: lessonsIn('interview-skills') },
 				{ label: 'Load balancer', items: lessonsIn('load-balancer') },
 				{ label: 'Rate limiter', items: lessonsIn('rate-limiter') },
 				{ label: 'Chat system', items: lessonsIn('chat-system') },
+				{ label: 'Distributed cache', items: lessonsIn('distributed-cache') },
 				{ label: 'Side topics', items: lessonsIn('misc') },
 			],
 		}),

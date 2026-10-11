@@ -80,6 +80,40 @@ The pattern: large services converge on an edge tier near users in front of the 
 **Sources:** [Slack: Migrating Millions of Concurrent Websockets to Envoy](https://slack.engineering/migrating-millions-of-concurrent-websockets-to-envoy/), [Slack: Real-time Messaging](https://slack.engineering/real-time-messaging/), [Meta zero downtime release (APNIC)](https://blog.apnic.net/2021/03/29/how-facebook-achieves-disruption-free-updates-with-zero-downtime/), [Discord Gateway docs](https://docs.discord.com/developers/events/gateway)
 </details>
 
+## Finding the recipient's server
+
+<details>
+<summary>Does a user → chat server map fit on one Redis server?</summary>
+
+By memory, yes: 200M entries at roughly 100 bytes each, Redis overhead included, is about 20 GB. By request rate, not if every message looks up its recipients: a few million lookups per second at WhatsApp scale, against roughly 100k–200k unpipelined operations per second for one instance. Batching, a local cache in each chat server, or more instances close the gap. Or skip lookups entirely with pub/sub (next question).
+
+**More:** [Back-of-the-envelope estimates](/interview-skills/estimates/)
+</details>
+
+<details>
+<summary>With Redis pub/sub for routing, do you still need a user → server map?</summary>
+
+Mostly not. Each chat server subscribes to a channel per connected user (or per conversation), and senders publish, so the subscriptions *are* the map. The load moves rather than vanishing: a lookup per recipient becomes a publish per recipient. At that scale, use sharded pub/sub (`SPUBLISH`, Redis 7), because classic `PUBLISH` in a cluster is sent to every node. `PUBLISH` returns how many subscribers received the message, so 0 suggests "offline: send a push notification." In a cluster, though, that count covers only the publisher's node.
+
+**More:** [Redis pub/sub](https://redis.io/docs/latest/develop/pubsub/), [PUBLISH](https://redis.io/docs/latest/commands/publish/)
+</details>
+
+<details>
+<summary>When does a user's entry in that map change? Only when a server dies?</summary>
+
+No, on every connect and disconnect. With load-based placement (power of two choices), a reconnecting user can land on a different server, and phones reconnect constantly: network switches, backgrounding, deploys. The rate is about concurrent connections ÷ average connection lifetime, for connects and again for disconnects. A crash is the case where nobody *can* update, so track liveness per chat server (one heartbeat key or lease each), not with a per-user TTL that would cost a refresh write per user.
+
+**More:** [Back-of-the-envelope estimates](/interview-skills/estimates/#habits-that-catch-the-usual-mistakes)
+</details>
+
+<details>
+<summary>Could you drop the map by hashing users to chat servers?</summary>
+
+Yes: `server = consistent_hash(user_id)` needs only the server list. You lose load-aware placement, and every membership change (crash, deploy, scaling) forces the affected users to move. All servers must also agree on the ring, so the server list needs a strongly consistent store such as etcd. Power of two choices keeps placement flexible and tolerates a slightly stale server list, at the cost of a per-user map or pub/sub subscriptions.
+
+**More:** [Partitioning and hot keys](/distributed-cache/partitioning/), [Why power of two choices for chat](/chat-system/design/#why-the-design-looks-like-this)
+</details>
+
 ## Connections and scale
 
 <details>

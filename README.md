@@ -14,6 +14,8 @@ System design interview prep, done by building. Each experiment starts the way a
 | 1 | [load-balancer/](load-balancer/README.md) | Built: backends, reverse proxy, round-robin | [lessons/load-balancer/](lessons/load-balancer/): cheat sheet, algorithms, client IP, deep dives, lab, FAQ |
 | 2 | [rate-limiter/](rate-limiter/README.md) | Planned (next) | [lessons/rate-limiter/](lessons/rate-limiter/): where rate limiting lives, FAQ |
 | 3 | [chat-system/](chat-system/README.md) | Designed, not built | [lessons/chat-system/](lessons/chat-system/) |
+| 4 | [distributed-cache/](distributed-cache/README.md) | Designed (mock interview), not built | [lessons/distributed-cache/](lessons/distributed-cache/): design, cache levels, consistency, partitioning, routing, FAQ |
+| – | [lessons/interview-skills/](lessons/interview-skills/) | Written | estimates |
 | – | [traffic-generator/](traffic-generator/README.md) | Planned | shared tool to drive load |
 | – | [misc/](misc/README.md) | Notes only | [lessons/misc/](lessons/misc/): DNS, E2EE, load generation limits |
 
@@ -27,6 +29,10 @@ System design interview prep, done by building. Each experiment starts the way a
 - "Design a URL shortener as a new experiment, same structure as the others."
 
 Edit `CLAUDE.md` to match you, e.g. your Go experience or a preferred language.
+
+### Sharing what you learn
+
+At the end of a study session, run **`/wrap-up`** in Claude Code. It updates your personal notes in `learners/<your-github-username>/notes.md` and, in the background, drafts fixes to the lessons wherever they fell short for you. You review both and pick what to send; that goes to the repo owner as a draft pull request. See [learners/](learners/README.md).
 
 ## Running things
 
@@ -63,9 +69,12 @@ site/                Astro Starlight site that publishes lessons/
 .devcontainer/       Codespaces environment for the labs (Go, Claude Code, ports)
 .vscode/tasks.json   one-click lab launchers
 CLAUDE.md            how Claude Code should teach here
+.claude/             /wrap-up skill and the lesson-editor agent
+learners/            each learner's personal notes (not on the site)
 load-balancer/       working notes (README), go/ (built), rust/ (optional)
 rate-limiter/        working notes (plan)
 chat-system/         working notes (plan)
+distributed-cache/   working notes (plan)
 traffic-generator/   working notes (plan)
 misc/                index of side topics
 ```

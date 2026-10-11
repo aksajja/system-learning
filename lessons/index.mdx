@@ -41,6 +41,11 @@ import { Card, CardGrid, LinkCard } from '../site/src/components/mdx';
 
 <CardGrid>
 	<LinkCard
+		title="Interview skills"
+		description="Back-of-the-envelope estimates: load from user actions, what one server can take, how many servers that means."
+		href="/interview-skills/estimates/"
+	/>
+	<LinkCard
 		title="1. Load balancer"
 		description="L4 vs L7, algorithms, health checks, 'isn't it a single point of failure?' Lab: build a round-robin reverse proxy."
 		href="/load-balancer/cheat-sheet/"
@@ -54,6 +59,11 @@ import { Card, CardGrid, LinkCard } from '../site/src/components/mdx';
 		title="3. Chat system"
 		description="WebSockets, routing messages across servers, L7 proxies vs direct connections, connections per server, multiplexing."
 		href="/chat-system/design/"
+	/>
+	<LinkCard
+		title="4. Distributed cache"
+		description="Consistency per kind of data, one authoritative copy, leases and fencing, consistent hashing and hot keys, where routing lives."
+		href="/distributed-cache/design/"
 	/>
 	<LinkCard
 		title="Side topics"
@@ -70,3 +80,5 @@ The repo's `CLAUDE.md` sets Claude Code up as a tutor: one concept per step, the
 - "Let's build step 1 of the rate limiter."
 - "Quiz me on the load balancer cheat sheet."
 - "Design a URL shortener as a new experiment, same structure as the others."
+
+When you're done, run `/wrap-up`. Claude saves a summary of what you learned to your own notes in the repo and drafts fixes wherever these lessons fell short for you. You choose what to send, and it goes in as a pull request for review. That's how the lessons get better for the next reader.
